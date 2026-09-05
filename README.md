@@ -74,8 +74,9 @@ For more information on using the Angular CLI, including detailed command refere
   - `stock`: `required`, `min(0)`
 
 ### Mensajes de error con *ngIf / *ngFor
-- Cada control expone un getter (`erroresNombre`, `erroresDescripcion`, etc.) que devuelve un **arreglo de mensajes** según el error presente (`hasError`).
-- En el template, `*ngIf` evalúa `invalid && (touched || dirty)` para decidir si mostrar errores, y `*ngFor` itera el arreglo de mensajes cuando un control tiene más de un error posible.
+- Las plantillas de mensajes se centralizan en el objeto `MENSAJES_ERROR`, que mapea cada nombre de control a sus mensajes por tipo de error (`required`, `minlength`, `min`).
+- El método genérico `obtenerErrores(nombreControl)` consulta ese mapa y el control del `FormGroup` (`hasError`) para devolver el **arreglo de mensajes** de ese campo.
+- En el template, `*ngIf` evalúa `invalid && (touched || dirty)` para decidir si mostrar errores, y `*ngFor` itera el arreglo devuelto por `obtenerErrores('nombre')`, `obtenerErrores('precio')`, etc., cuando un control tiene más de un error posible.
 - Los campos con error reciben la clase condicional `is-invalid` mediante `[class.is-invalid]`.
 
 ### Envío del formulario
@@ -89,16 +90,10 @@ For more information on using the Angular CLI, including detailed command refere
 
 ## Pruebas realizadas
 
-A continuación se describen las pruebas manuales ejecutadas sobre la aplicación y el resultado obtenido en cada caso.
+Cuando se hace clic en "Registrar producto" sin haber tocado ningún campo, la validación se dispara por completo: los cinco controles se marcan como tocados y cada uno muestra su aviso de campo obligatorio (nombre, descripción, precio, categoría y stock). También se despliega el bloque de resumen con la lista punto por punto. El observable del servicio nunca se dispara, así que no hay fila nueva en el listado ni mensaje en la consola; en otras palabras, un formulario vacío no llega al backend simulado.
 
-### 1. Formulario vacío enviado
-Se pulsó el botón "Registrar producto" sin llenar ningún campo. El formulario se marcó como inválido y todos los controles quedaron marcados como tocados (`markAllAsTouched`). Aparecieron los mensajes de error de los 5 campos: nombre obligatorio, descripción obligatoria, precio obligatorio, categoría obligatoria y stock obligatorio. Además se mostró el bloque de resumen de errores indicando cada campo con su mensaje. El servicio no fue llamado, por lo que no se registró ningún producto ni apareció log de confirmación en la consola.
+Introducir un precio en cero o negativo combinado con un stock negativo deja el formulario en rojo de inmediato. El control de precio exhibe "El precio debe ser mayor a 0.01" y el de stock "El stock no puede ser negativo", y aunque el resto de campos esté correcto, el envío queda bloqueado y el resumen de errores vuelve a aparecer al intentarlo. El producto, por supuesto, no se guarda.
 
-### 2. Precio negativo o en 0, y stock negativo
-Se ingresó un precio menor o igual a 0 y un stock negativo, completando el resto de los campos correctamente. El formulario se marcó como inválido y bloqueó el envío, mostrando el mensaje de error correspondiente: "El precio debe ser mayor a 0.01" para el precio y "El stock no puede ser negativo" para el stock. Al intentar enviar, volvió a aparecer el resumen de errores y el producto no fue registrado.
+Con un nombre abreviado a dos letras y una descripción corta (menos de diez caracteres), el formulario reclama la longitud mínima exacta de cada uno: "El nombre debe tener al menos 3 caracteres" para el primero y "La descripción debe tener al menos 10 caracteres" para el segundo. Ocurre lo que cabía esperar: ambos mensajes aparecen en sus respectivos campos y, al tratar de enviar, la validación impide pasar; el sistema se comporta igual de estricto que en los casos anteriores con respecto al resumen de errores.
 
-### 3. Nombre con menos de 3 caracteres y descripción con menos de 10
-Se escribió un nombre de solo 2 caracteres y una descripción de menos de 10 caracteres, con el resto de los campos válidos. Cada campo mostró su mensaje de longitud mínima específico: "El nombre debe tener al menos 3 caracteres" y "La descripción debe tener al menos 10 caracteres". Al intentar enviar, el formulario quedó inválido y el envío fue bloqueado.
-
-### 4. Formulario con todos los datos válidos
-Se completaron todos los campos con datos válidos (nombre, descripción, precio mayor a 0.01, categoría seleccionada y stock no negativo). El formulario fue válido, por lo que se llamó a `ProductoService.registrarProducto()`. Tras el `delay(1000)` se mostró el mensaje "Producto registrado correctamente", el formulario se reinició, y apareció el log de confirmación "Producto registrado en el backend" en la consola del navegador. El producto quedó visible en el listado (sección "Listado de Productos") con todos sus datos en la tabla.
+El último caso, con todos los datos válidos, es el único que llega hasta el servicio. El formulario pasa la validación sin obstáculos, `registrarProducto()` se ejecuta y, tras el retardo simulado de un segundo, la interfaz confirma el registro, el formulario vuelve a quedar limpio y en la consola del navegador aparece la confirmación "Producto registrado en el backend". Para rematar la verificación se navegó al listado y el producto apareció en la tabla con todos sus datos; además, la pantalla de inicio actualizó el contador de productos registrados en la sesión.

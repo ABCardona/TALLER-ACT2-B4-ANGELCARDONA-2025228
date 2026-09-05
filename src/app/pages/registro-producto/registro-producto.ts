@@ -4,6 +4,36 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Producto } from '../../models/producto';
 import { ProductoService } from '../../services/producto.service';
 
+const MENSAJES_ERROR: Record<string, Record<string, string>> = {
+  nombre: {
+    required: 'El nombre es obligatorio.',
+    minlength: 'El nombre debe tener al menos {min} caracteres.',
+  },
+  descripcion: {
+    required: 'La descripción es obligatoria.',
+    minlength: 'La descripción debe tener al menos {min} caracteres.',
+  },
+  precio: {
+    required: 'El precio es obligatorio.',
+    min: 'El precio debe ser mayor a 0.01.',
+  },
+  categoria: {
+    required: 'La categoría es obligatoria.',
+  },
+  stock: {
+    required: 'El stock es obligatorio.',
+    min: 'El stock no puede ser negativo.',
+  },
+};
+
+const ETIQUETAS: Record<string, string> = {
+  nombre: 'Nombre',
+  descripcion: 'Descripción',
+  precio: 'Precio',
+  categoria: 'Categoría',
+  stock: 'Stock',
+};
+
 @Component({
   selector: 'app-registro-producto',
   imports: [CommonModule, ReactiveFormsModule],
@@ -32,61 +62,23 @@ export class RegistroProductoComponent implements OnInit {
     });
   }
 
-  get erroresNombre(): string[] {
+  obtenerErrores(nombreControl: string): string[] {
+    const control = this.form.get(nombreControl);
+    const configuracion = MENSAJES_ERROR[nombreControl];
     const errores: string[] = [];
-    const control = this.form.get('nombre');
-    if (control?.hasError('required')) {
-      errores.push('El nombre es obligatorio.');
+    if (!control || !configuracion) {
+      return errores;
     }
-    if (control?.hasError('minlength')) {
-      const min = control.getError('minlength').requiredLength as number;
-      errores.push(`El nombre debe tener al menos ${min} caracteres.`);
+    if (control.hasError('required') && configuracion['required']) {
+      errores.push(configuracion['required']);
     }
-    return errores;
-  }
-
-  get erroresDescripcion(): string[] {
-    const errores: string[] = [];
-    const control = this.form.get('descripcion');
-    if (control?.hasError('required')) {
-      errores.push('La descripción es obligatoria.');
+    if (control.hasError('minlength') && configuracion['minlength']) {
+      const requerida = (control.getError('minlength') as { requiredLength: number })
+        .requiredLength;
+      errores.push(configuracion['minlength'].replace('{min}', String(requerida)));
     }
-    if (control?.hasError('minlength')) {
-      const min = control.getError('minlength').requiredLength as number;
-      errores.push(`La descripción debe tener al menos ${min} caracteres.`);
-    }
-    return errores;
-  }
-
-  get erroresPrecio(): string[] {
-    const errores: string[] = [];
-    const control = this.form.get('precio');
-    if (control?.hasError('required')) {
-      errores.push('El precio es obligatorio.');
-    }
-    if (control?.hasError('min')) {
-      errores.push('El precio debe ser mayor a 0.01.');
-    }
-    return errores;
-  }
-
-  get erroresCategoria(): string[] {
-    const errores: string[] = [];
-    const control = this.form.get('categoria');
-    if (control?.hasError('required')) {
-      errores.push('La categoría es obligatoria.');
-    }
-    return errores;
-  }
-
-  get erroresStock(): string[] {
-    const errores: string[] = [];
-    const control = this.form.get('stock');
-    if (control?.hasError('required')) {
-      errores.push('El stock es obligatorio.');
-    }
-    if (control?.hasError('min')) {
-      errores.push('El stock no puede ser negativo.');
+    if (control.hasError('min') && configuracion['min']) {
+      errores.push(configuracion['min']);
     }
     return errores;
   }
@@ -124,12 +116,12 @@ export class RegistroProductoComponent implements OnInit {
   }
 
   private generarResumenErrores(): void {
-    this.resumenErrores = [
-      ...this.erroresNombre.map((mensaje) => `Nombre: ${mensaje}`),
-      ...this.erroresDescripcion.map((mensaje) => `Descripción: ${mensaje}`),
-      ...this.erroresPrecio.map((mensaje) => `Precio: ${mensaje}`),
-      ...this.erroresCategoria.map((mensaje) => `Categoría: ${mensaje}`),
-      ...this.erroresStock.map((mensaje) => `Stock: ${mensaje}`),
-    ];
+    this.resumenErrores = [];
+    for (const nombreControl of Object.keys(MENSAJES_ERROR)) {
+      const etiqueta = ETIQUETAS[nombreControl];
+      for (const mensaje of this.obtenerErrores(nombreControl)) {
+        this.resumenErrores.push(`${etiqueta}: ${mensaje}`);
+      }
+    }
   }
 }

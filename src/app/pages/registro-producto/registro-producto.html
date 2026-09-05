@@ -15,7 +15,7 @@
         *ngIf="esInvalido('nombre')"
         class="errores"
       >
-        <p class="error" *ngFor="let mensaje of erroresNombre">{{ mensaje }}</p>
+        <p class="error" *ngFor="let mensaje of obtenerErrores('nombre')">{{ mensaje }}</p>
       </div>
     </div>
 
@@ -32,7 +32,7 @@
         *ngIf="esInvalido('descripcion')"
         class="errores"
       >
-        <p class="error" *ngFor="let mensaje of erroresDescripcion">{{ mensaje }}</p>
+        <p class="error" *ngFor="let mensaje of obtenerErrores('descripcion')">{{ mensaje }}</p>
       </div>
     </div>
 
@@ -50,7 +50,7 @@
         *ngIf="esInvalido('precio')"
         class="errores"
       >
-        <p class="error" *ngFor="let mensaje of erroresPrecio">{{ mensaje }}</p>
+        <p class="error" *ngFor="let mensaje of obtenerErrores('precio')">{{ mensaje }}</p>
       </div>
     </div>
 
@@ -72,7 +72,7 @@
         *ngIf="esInvalido('categoria')"
         class="errores"
       >
-        <p class="error" *ngFor="let mensaje of erroresCategoria">{{ mensaje }}</p>
+        <p class="error" *ngFor="let mensaje of obtenerErrores('categoria')">{{ mensaje }}</p>
       </div>
     </div>
 
@@ -90,7 +90,7 @@
         *ngIf="esInvalido('stock')"
         class="errores"
       >
-        <p class="error" *ngFor="let mensaje of erroresStock">{{ mensaje }}</p>
+        <p class="error" *ngFor="let mensaje of obtenerErrores('stock')">{{ mensaje }}</p>
       </div>
     </div>
 
