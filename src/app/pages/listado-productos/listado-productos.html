@@ -1,0 +1,28 @@
+<section class="listado">
+  <h1>Listado de Productos</h1>
+
+  <p *ngIf="productos.length === 0" class="vacio">
+    Aún no hay productos registrados en esta sesión.
+  </p>
+
+  <table *ngIf="productos.length > 0" class="tabla">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Categoría</th>
+        <th>Precio</th>
+        <th>Stock</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let producto of productos">
+        <td>{{ producto.nombre }}</td>
+        <td>{{ producto.descripcion }}</td>
+        <td>{{ producto.categoria }}</td>
+        <td>{{ producto.precio | currency }}</td>
+        <td>{{ producto.stock }}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>

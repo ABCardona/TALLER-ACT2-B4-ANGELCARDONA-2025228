@@ -1,0 +1,14 @@
+<section class="inicio">
+  <h1>Formulario Reactivo de Registro de Productos</h1>
+  <p>
+    Aplicación académica construida con componentes standalone de Angular,
+    formularios reactivos (ReactiveFormsModule) y Angular Router.
+  </p>
+  <p *ngIf="totalProductos > 0" class="contador">
+    Productos registrados en esta sesión: <strong>{{ totalProductos }}</strong>
+  </p>
+  <div class="acciones">
+    <a routerLink="/registro">Registrar producto</a>
+    <a routerLink="/listado">Ver listado</a>
+  </div>
+</section>
