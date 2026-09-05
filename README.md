@@ -86,3 +86,19 @@ For more information on using the Angular CLI, including detailed command refere
 - `ProductoService` (`providedIn: 'root'`) guarda los productos en un arreglo en memoria durante la sesión.
 - `registrarProducto(producto)` simula el envío al backend: devuelve un `Observable` de RxJS con `delay(1000)` y un `console.log` de confirmación.
 - `obtenerProductos()` alimenta el `ListadoProductosComponent`, que los muestra en una tabla.
+
+## Pruebas realizadas
+
+A continuación se describen las pruebas manuales ejecutadas sobre la aplicación y el resultado obtenido en cada caso.
+
+### 1. Formulario vacío enviado
+Se pulsó el botón "Registrar producto" sin llenar ningún campo. El formulario se marcó como inválido y todos los controles quedaron marcados como tocados (`markAllAsTouched`). Aparecieron los mensajes de error de los 5 campos: nombre obligatorio, descripción obligatoria, precio obligatorio, categoría obligatoria y stock obligatorio. Además se mostró el bloque de resumen de errores indicando cada campo con su mensaje. El servicio no fue llamado, por lo que no se registró ningún producto ni apareció log de confirmación en la consola.
+
+### 2. Precio negativo o en 0, y stock negativo
+Se ingresó un precio menor o igual a 0 y un stock negativo, completando el resto de los campos correctamente. El formulario se marcó como inválido y bloqueó el envío, mostrando el mensaje de error correspondiente: "El precio debe ser mayor a 0.01" para el precio y "El stock no puede ser negativo" para el stock. Al intentar enviar, volvió a aparecer el resumen de errores y el producto no fue registrado.
+
+### 3. Nombre con menos de 3 caracteres y descripción con menos de 10
+Se escribió un nombre de solo 2 caracteres y una descripción de menos de 10 caracteres, con el resto de los campos válidos. Cada campo mostró su mensaje de longitud mínima específico: "El nombre debe tener al menos 3 caracteres" y "La descripción debe tener al menos 10 caracteres". Al intentar enviar, el formulario quedó inválido y el envío fue bloqueado.
+
+### 4. Formulario con todos los datos válidos
+Se completaron todos los campos con datos válidos (nombre, descripción, precio mayor a 0.01, categoría seleccionada y stock no negativo). El formulario fue válido, por lo que se llamó a `ProductoService.registrarProducto()`. Tras el `delay(1000)` se mostró el mensaje "Producto registrado correctamente", el formulario se reinició, y apareció el log de confirmación "Producto registrado en el backend" en la consola del navegador. El producto quedó visible en el listado (sección "Listado de Productos") con todos sus datos en la tabla.
